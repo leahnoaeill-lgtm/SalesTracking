@@ -48,7 +48,7 @@ tr:hover td{background:#f8fbfd}
   <button type="submit">Apply</button>
   <a class="btn sec" href="/">Reset</a>
   {% if is_admin %}<a class="btn accent" href="/export?q={{ search }}&state={{ state }}&kam={{ kam }}&sort={{ sort }}&dir={{ direction }}">Export Excel</a>{% endif %}
-  <span class="count">{{ rows|length }} providers</span>
+  <span class="count">{{ rows|length }} providers (data from 2023 Medicare Claims Only)</span>
 </form>
 {% macro th(key,label) %}
   {% set d = 'desc' if sort==key and direction=='asc' else 'asc' %}
