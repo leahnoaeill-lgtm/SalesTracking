@@ -31,6 +31,7 @@ def migrate():
     add('providers', 'next_step_by', 'TEXT')
     add('providers', 'next_step_at', 'TEXT')
     add('providers', 'kam', 'TEXT')
+    add('providers', 'ir', 'TEXT')
     # States west of the Mississippi River
     west = {'WA','OR','CA','NV','ID','MT','WY','UT','AZ','CO','NM','ND','SD',
             'NE','KS','OK','TX','MN','IA','MO','AR','LA','AK','HI'}
@@ -167,6 +168,14 @@ def update_kam(npi):
     conn.commit(); conn.close()
     return redirect(url_for('provider', npi=npi))
 
+@app.route('/provider/<npi>/ir', methods=['POST'])
+def update_ir(npi):
+    ir = request.form.get('ir', '').strip()
+    conn = db()
+    conn.execute("UPDATE providers SET ir=? WHERE npi=?", (ir, npi))
+    conn.commit(); conn.close()
+    return redirect(url_for('provider', npi=npi))
+
 @app.route('/provider/<npi>/next_step', methods=['POST'])
 def update_next_step(npi):
     user = current_user()
@@ -191,13 +200,13 @@ def export():
     ws = wb.active; ws.title = 'Providers'
     ws.append(['NPI','Last Name','First Name','Credentials','Specialty',
                'Patient Focus','Conditions','Total Claims','Beneficiaries',
-               'City','State','KAM','Clinic Name','Latest Activity','Latest Activity Date',
+               'City','State','KAM','IR','Clinic Name','Latest Activity','Latest Activity Date',
                'Next Step','Next Step By','Next Step At'])
     for r in rows:
         ws.append([r['npi'], r['last_name'], r['first_name'], r['credentials'],
                    r['specialty'], r['patient_focus'], r['conditions'],
                    r['total_claims'], r['beneficiaries'], r['city'], r['state'],
-                   r['kam'], r['clinic_name'], r['latest_type'], r['latest_date'],
+                   r['kam'], r['ir'], r['clinic_name'], r['latest_type'], r['latest_date'],
                    r['next_step'], r['next_step_by'], r['next_step_at']])
     ws2 = wb.create_sheet('Activities')
     ws2.append(['NPI','Last Name','First Name','Activity Type','Activity Date',

@@ -64,6 +64,12 @@ details[open]{margin-top:6px}
         <button>Save</button>
       </form>
     </div>
+    <div><b>IR</b>
+      <form method="post" action="/provider/{{ p['npi'] }}/ir" style="display:flex;gap:6px;margin-top:2px">
+        <input type="text" name="ir" value="{{ p['ir'] or '' }}" style="flex:1">
+        <button>Save</button>
+      </form>
+    </div>
   </div>
 </div>
 
