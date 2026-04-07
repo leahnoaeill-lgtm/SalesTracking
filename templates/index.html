@@ -47,7 +47,7 @@ tr:hover td{background:#f8fbfd}
   <input type="hidden" name="sort" value="{{ sort }}"><input type="hidden" name="dir" value="{{ direction }}">
   <button type="submit">Apply</button>
   <a class="btn sec" href="/">Reset</a>
-  <a class="btn accent" href="/export?q={{ search }}&state={{ state }}&kam={{ kam }}&sort={{ sort }}&dir={{ direction }}">Export Excel</a>
+  {% if is_admin %}<a class="btn accent" href="/export?q={{ search }}&state={{ state }}&kam={{ kam }}&sort={{ sort }}&dir={{ direction }}">Export Excel</a>{% endif %}
   <span class="count">{{ rows|length }} providers</span>
 </form>
 {% macro th(key,label) %}

@@ -6,6 +6,7 @@ import openpyxl
 
 DB = os.path.join(os.path.dirname(__file__), 'be_strategy.db')
 ACTIVITY_TYPES = ['call', 'email', 'site visit', 'training', 'demo']
+ADMIN_USERS = {u.strip() for u in os.environ.get('ADMIN_USERS', '').split(',') if u.strip()}
 
 app = Flask(__name__)
 
@@ -53,6 +54,13 @@ SORTABLE = {
 
 def current_user():
     return request.cookies.get('sales_user', '')
+
+def is_admin():
+    return current_user() in ADMIN_USERS
+
+@app.context_processor
+def inject_admin():
+    return {'is_admin': is_admin()}
 
 def fetch_rows(sort='last_name', direction='asc', search='', state='', kam=''):
     sort_col = SORTABLE.get(sort, 'p.last_name')
@@ -190,6 +198,8 @@ def update_next_step(npi):
 
 @app.route('/export')
 def export():
+    if not is_admin():
+        return "Forbidden — admin access required", 403
     sort = request.args.get('sort', 'last_name')
     direction = request.args.get('dir', 'asc')
     search = request.args.get('q', '')
