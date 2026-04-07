@@ -1,0 +1,129 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>{{ p['first_name'] }} {{ p['last_name'] }} — BE Strategy</title>
+<style>
+:root{--slate:#5A6770;--blue:#6EC6E0;--orange:#F39A2B;--green:#B5D14A;--bg:#f4f6f8;--line:#e3e7eb}
+*{box-sizing:border-box}
+body{font-family:-apple-system,Segoe UI,sans-serif;margin:0;background:var(--bg);color:var(--slate)}
+header{background:#fff;border-bottom:3px solid var(--blue);padding:14px 24px;display:flex;align-items:center;gap:16px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+header img{height:44px}
+header h1{margin:0;font-size:18px;color:var(--slate);font-weight:600}
+.user{margin-left:auto;font-size:13px;display:flex;gap:8px;align-items:center}
+.user input{padding:6px 10px;border:1px solid var(--line);border-radius:6px}
+main{padding:20px 24px;max-width:1150px}
+a{color:var(--blue);text-decoration:none}
+.card{background:#fff;border-radius:8px;padding:18px 22px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-top:3px solid var(--blue)}
+.card.orange{border-top-color:var(--orange)}
+.card.green{border-top-color:var(--green)}
+h1{margin:0 0 4px;color:var(--slate)}
+h2{margin:0 0 12px;font-size:16px;color:var(--slate);text-transform:uppercase;letter-spacing:.5px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 28px;font-size:14px}
+.grid div b{display:block;color:var(--slate);opacity:.6;font-size:11px;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:#eef4f7;color:var(--slate)}
+form.inline{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+label{font-size:11px;color:var(--slate);opacity:.7;display:block;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+input,select,textarea{padding:8px 10px;border:1px solid var(--line);border-radius:6px;font-family:inherit;font-size:13px;color:var(--slate);background:#fff}
+textarea{min-width:320px;min-height:40px}
+button,a.btn{background:var(--blue);color:#fff;padding:9px 16px;border:0;border-radius:6px;cursor:pointer;font-weight:600;font-size:13px;text-decoration:none;display:inline-block}
+a.btn.sec{background:var(--slate)}
+.badge{display:inline-block;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600;text-transform:capitalize;color:#fff;background:var(--green)}
+.meta{font-size:11px;color:var(--slate);opacity:.65;font-style:italic}
+.edited{color:var(--orange);font-weight:600;font-style:normal}
+.back{display:inline-block;margin-bottom:10px;color:var(--slate);font-weight:600}
+details summary{cursor:pointer;color:var(--blue);font-size:12px;font-weight:600}
+details[open]{margin-top:6px}
+</style></head><body>
+<header>
+  <img src="/static/logo.png" alt="abm Respiratory Care">
+  <h1>BE Strategy — Provider Detail</h1>
+  <form class="user" method="post" action="/set_user">
+    <label>Your name:</label>
+    <input type="text" name="name" value="{{ user }}" required>
+    <button type="submit">Save</button>
+  </form>
+</header>
+<main>
+<a class="back" href="/">&larr; Back to dashboard</a>
+
+<div class="card">
+  <h1>{{ p['first_name'] }} {{ p['last_name'] }}{% if p['credentials'] %}, {{ p['credentials'] }}{% endif %}</h1>
+  <div class="grid">
+    <div><b>NPI</b>{{ p['npi'] }}</div>
+    <div><b>Specialty</b>{{ p['specialty'] or '—' }}</div>
+    <div><b>Patient Focus</b>{{ p['patient_focus'] or '—' }}</div>
+    <div><b>Conditions</b>{{ p['conditions'] or '—' }}</div>
+    <div><b>Total Claims</b>{{ p['total_claims'] or '—' }}</div>
+    <div><b>Beneficiaries</b>{{ p['beneficiaries'] or '—' }}</div>
+    <div><b>City</b>{{ p['city'] or '—' }}</div>
+    <div><b>State</b>{{ p['state'] or '—' }}</div>
+    <div><b>Clinic Name</b>{{ p['clinic_name'] or '—' }}</div>
+    <div><b>KAM</b>
+      <form method="post" action="/provider/{{ p['npi'] }}/kam" style="display:flex;gap:6px;margin-top:2px">
+        <input type="text" name="kam" value="{{ p['kam'] or '' }}" style="flex:1">
+        <button>Save</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Clinics</h2>
+  <table><thead><tr><th>Name</th><th>Address</th><th>City</th><th>State</th><th>Zip</th></tr></thead><tbody>
+  {% for c in clinics %}
+  <tr><td>{{ c['name'] }}</td><td>{{ c['address'] }}</td><td>{{ c['city'] }}</td><td>{{ c['state'] }}</td><td>{{ c['zip'] }}</td></tr>
+  {% endfor %}
+  </tbody></table>
+</div>
+
+<div class="card green">
+  <h2>Log Activity</h2>
+  <form class="inline" method="post" action="/provider/{{ p['npi'] }}/activity">
+    <div><label>Activity Type</label>
+      <select name="activity_type" required>
+        {% for t in activity_types %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+      </select></div>
+    <div><label>Activity Date</label><input type="date" name="activity_date" required></div>
+    <div><label>Notes</label><textarea name="notes"></textarea></div>
+    <div><label>Next Step</label><textarea name="next_step">{{ p['next_step'] or '' }}</textarea></div>
+    <button>Add</button>
+  </form>
+  {% if p['next_step_by'] %}
+    <div class="meta" style="margin-top:8px">Next step last updated by {{ p['next_step_by'] }} on {{ p['next_step_at']|fmtdate }}</div>
+  {% endif %}
+  {% if not user %}<div class="meta" style="margin-top:8px;color:var(--orange)">Set your name in the header first.</div>{% endif %}
+</div>
+
+<div class="card">
+  <h2>Activity History ({{ activities|length }})</h2>
+  <table><thead><tr><th>Date</th><th>Type</th><th>Notes</th><th>Logged By</th><th>Edit</th></tr></thead><tbody>
+  {% for a in activities %}
+  <tr>
+    <td>{{ a['activity_date']|fmtdate }}</td>
+    <td><span class="badge">{{ a['activity_type'] }}</span></td>
+    <td>{{ a['notes'] or '' }}</td>
+    <td>
+      {{ a['created_by'] or '—' }}<div class="meta">{{ a['created_at']|fmtdate }}</div>
+      {% if a['updated_by'] %}<div class="meta"><span class="edited">edited</span> by {{ a['updated_by'] }} on {{ a['updated_at']|fmtdate }}</div>{% endif %}
+    </td>
+    <td>
+      <details><summary>Edit</summary>
+        <form method="post" action="/activity/{{ a['id'] }}/edit" style="margin-top:8px;display:flex;flex-direction:column;gap:6px">
+          <select name="activity_type">
+            {% for t in activity_types %}<option value="{{ t }}" {% if t==a['activity_type'] %}selected{% endif %}>{{ t }}</option>{% endfor %}
+          </select>
+          <input type="date" name="activity_date" value="{{ a['activity_date'] }}" required>
+          <label>Notes</label><textarea name="notes">{{ a['notes'] or '' }}</textarea>
+          <label>Next Step</label><textarea name="next_step">{{ p['next_step'] or '' }}</textarea>
+          <button>Save</button>
+        </form>
+      </details>
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="5" class="meta">No activities yet.</td></tr>
+  {% endfor %}
+  </tbody></table>
+</div>
+</main>
+</body></html>

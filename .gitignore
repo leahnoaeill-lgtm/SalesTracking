@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+be_strategy.db
+*.log
+.DS_Store
+~$*

@@ -1,0 +1,80 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>BE Strategy — Sales Dashboard</title>
+<style>
+:root{--slate:#5A6770;--blue:#6EC6E0;--orange:#F39A2B;--green:#B5D14A;--bg:#f4f6f8;--line:#e3e7eb}
+*{box-sizing:border-box}
+body{font-family:-apple-system,Segoe UI,sans-serif;margin:0;background:var(--bg);color:var(--slate)}
+header{background:#fff;border-bottom:3px solid var(--blue);padding:14px 24px;display:flex;align-items:center;gap:16px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+header img{height:44px}
+header h1{margin:0;font-size:18px;color:var(--slate);font-weight:600}
+header .dots{display:inline-flex;gap:5px;margin-left:6px}
+header .dots span{width:9px;height:9px;border-radius:50%}
+.d1{background:var(--blue)}.d2{background:var(--orange)}.d3{background:var(--green)}
+.user{margin-left:auto;font-size:13px;display:flex;gap:8px;align-items:center}
+.user input{padding:6px 10px;border:1px solid var(--line);border-radius:6px}
+main{padding:20px 24px}
+.bar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+input[type=text]{padding:9px 12px;border:1px solid var(--line);border-radius:6px;min-width:280px;background:#fff}
+a.btn,button{background:var(--blue);color:#fff;padding:9px 16px;border:0;border-radius:6px;text-decoration:none;cursor:pointer;font-weight:600;font-size:13px}
+a.btn.sec{background:var(--slate)}
+a.btn.accent{background:var(--orange)}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);font-size:13px;text-align:left}
+th{background:#eef4f7;color:var(--slate);font-weight:600}
+th a{color:var(--slate);text-decoration:none}
+tr:hover td{background:#f8fbfd}
+.count{color:var(--slate);font-size:13px;opacity:.75}
+.badge{display:inline-block;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600;text-transform:capitalize;color:#fff;background:var(--green)}
+</style></head><body>
+<header>
+  <img src="/static/logo.png" alt="abm Respiratory Care">
+  <h1>BE Strategy — Sales Dashboard<span class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></span></h1>
+  <form class="user" method="post" action="/set_user">
+    <label>Your name:</label>
+    <input type="text" name="name" value="{{ user }}" placeholder="e.g. Jane Smith" required>
+    <button type="submit">Save</button>
+  </form>
+</header>
+<main>
+<form class="bar" method="get">
+  <input type="text" name="q" value="{{ search }}" placeholder="Search name, city, state, clinic, specialty, NPI">
+  <select name="state"><option value="">All States</option>
+    {% for s in states %}<option value="{{ s }}" {% if s==state %}selected{% endif %}>{{ s }}</option>{% endfor %}
+  </select>
+  <select name="kam"><option value="">All KAMs</option>
+    {% for k in kams %}<option value="{{ k }}" {% if k==kam %}selected{% endif %}>{{ k }}</option>{% endfor %}
+  </select>
+  <input type="hidden" name="sort" value="{{ sort }}"><input type="hidden" name="dir" value="{{ direction }}">
+  <button type="submit">Apply</button>
+  <a class="btn sec" href="/">Reset</a>
+  <a class="btn accent" href="/export?q={{ search }}&state={{ state }}&kam={{ kam }}&sort={{ sort }}&dir={{ direction }}">Export Excel</a>
+  <span class="count">{{ rows|length }} providers</span>
+</form>
+{% macro th(key,label) %}
+  {% set d = 'desc' if sort==key and direction=='asc' else 'asc' %}
+  <th><a href="?sort={{ key }}&dir={{ d }}&q={{ search }}&state={{ state }}&kam={{ kam }}">{{ label }}{% if sort==key %} {{ '▲' if direction=='asc' else '▼' }}{% endif %}</a></th>
+{% endmacro %}
+<table><thead><tr>
+{{ th('last_name','Last Name') }}{{ th('first_name','First Name') }}
+{{ th('credentials','Credentials') }}{{ th('specialty','Specialty') }}
+{{ th('total_claims','Claims') }}{{ th('beneficiaries','Beneficiaries') }}
+{{ th('city','City') }}{{ th('state','State') }}{{ th('kam','KAM') }}{{ th('clinic_name','Clinic Name') }}
+{{ th('activity_type','Latest Activity') }}{{ th('activity_date','Activity Date') }}
+{{ th('next_step','Next Step') }}
+</tr></thead><tbody>
+{% for r in rows %}
+<tr onclick="location.href='/provider/{{ r['npi'] }}'" style="cursor:pointer">
+  <td>{{ r['last_name'] or '' }}</td><td>{{ r['first_name'] or '' }}</td>
+  <td>{{ r['credentials'] or '' }}</td><td>{{ r['specialty'] or '' }}</td>
+  <td>{{ r['total_claims'] or '' }}</td><td>{{ r['beneficiaries'] or '' }}</td>
+  <td>{{ r['city'] or '' }}</td><td>{{ r['state'] or '' }}</td>
+  <td>{{ r['kam'] or '' }}</td>
+  <td>{{ r['clinic_name'] or '' }}</td>
+  <td>{% if r['latest_type'] %}<span class="badge">{{ r['latest_type'] }}</span>{% endif %}</td>
+  <td>{{ r['latest_date']|fmtdate }}</td>
+  <td>{{ r['next_step'] or '' }}</td>
+</tr>
+{% endfor %}
+</tbody></table>
+</main>
+</body></html>
