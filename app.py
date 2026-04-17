@@ -217,8 +217,9 @@ def add_provider():
         kam = 'Mark Frantzen' if state in WEST_STATES else 'Mike Grillo'
     conn.execute("""INSERT INTO providers
         (npi, first_name, last_name, credentials, specialty, patient_focus,
-         conditions, city, state, clinic_name, kam, ir, next_step)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,'')""",
+         conditions, city, state, clinic_name, kam, ir, next_step,
+         total_claims, beneficiaries)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,'',0,0)""",
         (npi,
          request.form.get('first_name', '').strip(),
          request.form.get('last_name', '').strip(),
