@@ -58,9 +58,12 @@ def current_user():
 def is_admin():
     return current_user() in ADMIN_USERS
 
+def is_clinic_admin():
+    return current_user() == 'Leah Noaeill'
+
 @app.context_processor
 def inject_admin():
-    return {'is_admin': is_admin()}
+    return {'is_admin': is_admin(), 'is_clinic_admin': is_clinic_admin()}
 
 def fetch_rows(sort='last_name', direction='asc', search='', state='', kam=''):
     sort_col = SORTABLE.get(sort, 'p.last_name')
@@ -194,6 +197,48 @@ def update_next_step(npi):
                     WHERE npi=?""",
                  (ns, user, datetime.utcnow().isoformat(timespec='seconds'), npi))
     conn.commit(); conn.close()
+    return redirect(url_for('provider', npi=npi))
+
+@app.route('/provider/<npi>/clinic', methods=['POST'])
+def add_clinic(npi):
+    if not is_clinic_admin(): return "Forbidden", 403
+    name = request.form.get('name', '').strip()
+    if not name: return "Clinic name required", 400
+    address = request.form.get('address', '').strip()
+    city = request.form.get('city', '').strip()
+    state = request.form.get('state', '').strip()
+    zip_ = request.form.get('zip', '').strip()
+    conn = db()
+    conn.execute("""INSERT INTO clinics (npi, name, address, city, state, zip)
+                    VALUES (?,?,?,?,?,?)""",
+                 (npi, name, address, city, state, zip_))
+    conn.commit(); conn.close()
+    return redirect(url_for('provider', npi=npi))
+
+@app.route('/clinic/<int:cid>/edit', methods=['POST'])
+def edit_clinic(cid):
+    if not is_clinic_admin(): return "Forbidden", 403
+    name = request.form.get('name', '').strip()
+    address = request.form.get('address', '').strip()
+    city = request.form.get('city', '').strip()
+    state = request.form.get('state', '').strip()
+    zip_ = request.form.get('zip', '').strip()
+    conn = db()
+    row = conn.execute("SELECT npi FROM clinics WHERE id=?", (cid,)).fetchone()
+    if not row: conn.close(); return "Not found", 404
+    conn.execute("""UPDATE clinics SET name=?, address=?, city=?, state=?, zip=?
+                    WHERE id=?""", (name, address, city, state, zip_, cid))
+    conn.commit(); npi = row['npi']; conn.close()
+    return redirect(url_for('provider', npi=npi))
+
+@app.route('/clinic/<int:cid>/delete', methods=['POST'])
+def delete_clinic(cid):
+    if not is_clinic_admin(): return "Forbidden", 403
+    conn = db()
+    row = conn.execute("SELECT npi FROM clinics WHERE id=?", (cid,)).fetchone()
+    if not row: conn.close(); return "Not found", 404
+    conn.execute("DELETE FROM clinics WHERE id=?", (cid,))
+    conn.commit(); npi = row['npi']; conn.close()
     return redirect(url_for('provider', npi=npi))
 
 @app.route('/export')

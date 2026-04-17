@@ -75,11 +75,43 @@ details[open]{margin-top:6px}
 
 <div class="card">
   <h2>Clinics</h2>
-  <table><thead><tr><th>Name</th><th>Address</th><th>City</th><th>State</th><th>Zip</th></tr></thead><tbody>
+  {% if is_clinic_admin %}
+    {% for c in clinics %}
+      <form method="post" action="/clinic/{{ c['id'] }}/edit" id="edit-clinic-{{ c['id'] }}"></form>
+      <form method="post" action="/clinic/{{ c['id'] }}/delete" id="del-clinic-{{ c['id'] }}" onsubmit="return confirm('Delete this clinic?');"></form>
+    {% endfor %}
+  {% endif %}
+  <table><thead><tr><th>Name</th><th>Address</th><th>City</th><th>State</th><th>Zip</th>{% if is_clinic_admin %}<th>Actions</th>{% endif %}</tr></thead><tbody>
   {% for c in clinics %}
-  <tr><td>{{ c['name'] }}</td><td>{{ c['address'] }}</td><td>{{ c['city'] }}</td><td>{{ c['state'] }}</td><td>{{ c['zip'] }}</td></tr>
+    {% if is_clinic_admin %}
+    <tr>
+      <td><input form="edit-clinic-{{ c['id'] }}" name="name" value="{{ c['name'] or '' }}" style="width:100%"></td>
+      <td><input form="edit-clinic-{{ c['id'] }}" name="address" value="{{ c['address'] or '' }}" style="width:100%"></td>
+      <td><input form="edit-clinic-{{ c['id'] }}" name="city" value="{{ c['city'] or '' }}" style="width:100%"></td>
+      <td><input form="edit-clinic-{{ c['id'] }}" name="state" value="{{ c['state'] or '' }}" style="width:60px"></td>
+      <td><input form="edit-clinic-{{ c['id'] }}" name="zip" value="{{ c['zip'] or '' }}" style="width:90px"></td>
+      <td style="white-space:nowrap">
+        <button form="edit-clinic-{{ c['id'] }}" type="submit">Save</button>
+        <button form="del-clinic-{{ c['id'] }}" type="submit" style="background:#d9534f">Delete</button>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td>{{ c['name'] }}</td><td>{{ c['address'] }}</td><td>{{ c['city'] }}</td><td>{{ c['state'] }}</td><td>{{ c['zip'] }}</td></tr>
+    {% endif %}
+  {% else %}
+  <tr><td colspan="{% if is_clinic_admin %}6{% else %}5{% endif %}" class="meta">No clinics on file.</td></tr>
   {% endfor %}
   </tbody></table>
+  {% if is_clinic_admin %}
+  <form method="post" action="/provider/{{ p['npi'] }}/clinic" style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+    <div style="flex:2;min-width:180px"><label>Name</label><input name="name" required style="width:100%"></div>
+    <div style="flex:2;min-width:180px"><label>Address</label><input name="address" style="width:100%"></div>
+    <div style="flex:1;min-width:100px"><label>City</label><input name="city" style="width:100%"></div>
+    <div><label>State</label><input name="state" style="width:60px"></div>
+    <div><label>Zip</label><input name="zip" style="width:90px"></div>
+    <button type="submit">Add Clinic</button>
+  </form>
+  {% endif %}
 </div>
 
 <div class="card green">
