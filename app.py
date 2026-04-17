@@ -199,6 +199,41 @@ def update_next_step(npi):
     conn.commit(); conn.close()
     return redirect(url_for('provider', npi=npi))
 
+WEST_STATES = {'WA','OR','CA','NV','ID','MT','WY','UT','AZ','CO','NM','ND','SD',
+               'NE','KS','OK','TX','MN','IA','MO','AR','LA','AK','HI'}
+
+@app.route('/provider/new', methods=['POST'])
+def add_provider():
+    if not is_clinic_admin(): return "Forbidden", 403
+    npi = request.form.get('npi', '').strip()
+    if not npi: return "NPI required", 400
+    conn = db()
+    exists = conn.execute("SELECT 1 FROM providers WHERE npi=?", (npi,)).fetchone()
+    if exists:
+        conn.close(); return f"NPI {npi} already exists", 400
+    state = request.form.get('state', '').strip().upper()
+    kam = request.form.get('kam', '').strip()
+    if not kam:
+        kam = 'Mark Frantzen' if state in WEST_STATES else 'Mike Grillo'
+    conn.execute("""INSERT INTO providers
+        (npi, first_name, last_name, credentials, specialty, patient_focus,
+         conditions, city, state, clinic_name, kam, ir, next_step)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,'')""",
+        (npi,
+         request.form.get('first_name', '').strip(),
+         request.form.get('last_name', '').strip(),
+         request.form.get('credentials', '').strip(),
+         request.form.get('specialty', '').strip(),
+         request.form.get('patient_focus', '').strip(),
+         request.form.get('conditions', '').strip(),
+         request.form.get('city', '').strip(),
+         state,
+         request.form.get('clinic_name', '').strip(),
+         kam,
+         request.form.get('ir', '').strip()))
+    conn.commit(); conn.close()
+    return redirect(url_for('provider', npi=npi))
+
 @app.route('/provider/<npi>/clinic', methods=['POST'])
 def add_clinic(npi):
     if not is_clinic_admin(): return "Forbidden", 403
