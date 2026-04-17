@@ -234,6 +234,28 @@ def add_provider():
     conn.commit(); conn.close()
     return redirect(url_for('provider', npi=npi))
 
+@app.route('/provider/<npi>/edit', methods=['POST'])
+def edit_provider(npi):
+    if not is_clinic_admin(): return "Forbidden", 403
+    conn = db()
+    row = conn.execute("SELECT 1 FROM providers WHERE npi=?", (npi,)).fetchone()
+    if not row: conn.close(); return "Not found", 404
+    conn.execute("""UPDATE providers SET first_name=?, last_name=?, credentials=?,
+                    specialty=?, patient_focus=?, conditions=?, city=?, state=?,
+                    clinic_name=? WHERE npi=?""",
+                 (request.form.get('first_name', '').strip(),
+                  request.form.get('last_name', '').strip(),
+                  request.form.get('credentials', '').strip(),
+                  request.form.get('specialty', '').strip(),
+                  request.form.get('patient_focus', '').strip(),
+                  request.form.get('conditions', '').strip(),
+                  request.form.get('city', '').strip(),
+                  request.form.get('state', '').strip().upper(),
+                  request.form.get('clinic_name', '').strip(),
+                  npi))
+    conn.commit(); conn.close()
+    return redirect(url_for('provider', npi=npi))
+
 @app.route('/provider/<npi>/clinic', methods=['POST'])
 def add_clinic(npi):
     if not is_clinic_admin(): return "Forbidden", 403

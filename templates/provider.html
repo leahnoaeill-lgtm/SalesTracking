@@ -71,6 +71,23 @@ details[open]{margin-top:6px}
       </form>
     </div>
   </div>
+  {% if is_clinic_admin %}
+  <details style="margin-top:14px">
+    <summary>Edit provider info</summary>
+    <form method="post" action="/provider/{{ p['npi'] }}/edit" style="margin-top:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px 14px">
+      <div><label>First Name</label><input name="first_name" value="{{ p['first_name'] or '' }}" style="width:100%;min-width:0"></div>
+      <div><label>Last Name</label><input name="last_name" value="{{ p['last_name'] or '' }}" style="width:100%;min-width:0"></div>
+      <div><label>Credentials</label><input name="credentials" value="{{ p['credentials'] or '' }}" style="width:100%;min-width:0"></div>
+      <div><label>Specialty</label><input name="specialty" value="{{ p['specialty'] or '' }}" style="width:100%;min-width:0"></div>
+      <div><label>Patient Focus</label><input name="patient_focus" value="{{ p['patient_focus'] or '' }}" style="width:100%;min-width:0"></div>
+      <div><label>Conditions</label><input name="conditions" value="{{ p['conditions'] or '' }}" style="width:100%;min-width:0"></div>
+      <div><label>City</label><input name="city" value="{{ p['city'] or '' }}" style="width:100%;min-width:0"></div>
+      <div><label>State (2 letters)</label><input name="state" maxlength="2" value="{{ p['state'] or '' }}" style="width:100%;min-width:0;text-transform:uppercase"></div>
+      <div><label>Clinic Name</label><input name="clinic_name" value="{{ p['clinic_name'] or '' }}" style="width:100%;min-width:0"></div>
+      <div style="grid-column:1/-1"><button type="submit">Save provider info</button></div>
+    </form>
+  </details>
+  {% endif %}
 </div>
 
 <div class="card">
