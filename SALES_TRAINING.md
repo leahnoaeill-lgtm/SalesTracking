@@ -28,7 +28,7 @@ The dashboard shows every physician account with their key information.
 | Specialty | Medical specialty (e.g., Pulmonology) |
 | Claims / Beneficiaries | 2023 Medicare volume for HCPCS E0483 |
 | City / State | Practice location |
-| KAM | Key Account Manager assigned (Mark Franzen = West, Mike Grillo = East) |
+| KAM | Key Account Manager assigned (Mark Frantzen = West, Mike Grillo = East) |
 | Clinic Name | Primary clinic |
 | Latest Activity | Most recent activity type logged |
 | Activity Date | Date of the latest activity |
@@ -43,7 +43,7 @@ Type into the **search box** to filter by name, city, state, clinic, specialty, 
 ### Filtering
 Use the dropdowns to narrow results:
 - **State** — show only providers in one state
-- **KAM** — show only Mark Franzen's or Mike Grillo's accounts
+- **KAM** — show only Mark Frantzen's or Mike Grillo's accounts
 
 Click **Apply** to apply filters, or **Reset** to clear everything.
 

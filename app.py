@@ -38,7 +38,7 @@ def migrate():
             'NE','KS','OK','TX','MN','IA','MO','AR','LA','AK','HI'}
     rows = conn.execute("SELECT npi, state FROM providers WHERE kam IS NULL OR kam=''").fetchall()
     for r in rows:
-        kam = 'Mark Franzen' if (r['state'] or '').upper() in west else 'Mike Grillo'
+        kam = 'Mark Frantzen' if (r['state'] or '').upper() in west else 'Mike Grillo'
         conn.execute("UPDATE providers SET kam=? WHERE npi=?", (kam, r['npi']))
     conn.commit(); conn.close()
 migrate()
