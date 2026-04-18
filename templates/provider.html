@@ -53,8 +53,8 @@ details[open]{margin-top:6px}
     <div><b>Specialty</b>{{ p['specialty'] or '—' }}</div>
     <div><b>Patient Focus</b>{{ p['patient_focus'] or '—' }}</div>
     <div><b>Conditions</b>{{ p['conditions'] or '—' }}</div>
-    <div><b>Total Claims</b>{{ p['total_claims'] or '—' }}</div>
-    <div><b>Beneficiaries</b>{{ p['beneficiaries'] or '—' }}</div>
+    <div><b>Total Claims</b>{{ p['total_claims'] if p['total_claims'] is not none else '—' }}</div>
+    <div><b>Beneficiaries</b>{{ p['beneficiaries'] if p['beneficiaries'] is not none else '—' }}</div>
     <div><b>City</b>{{ p['city'] or '—' }}</div>
     <div><b>State</b>{{ p['state'] or '—' }}</div>
     <div><b>Clinic Name</b>{{ p['clinic_name'] or '—' }}</div>

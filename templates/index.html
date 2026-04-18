@@ -86,7 +86,7 @@ tr:hover td{background:#f8fbfd}
 <tr onclick="location.href='/provider/{{ r['npi'] }}'" style="cursor:pointer">
   <td>{{ r['last_name'] or '' }}</td><td>{{ r['first_name'] or '' }}</td>
   <td>{{ r['credentials'] or '' }}</td><td>{{ r['specialty'] or '' }}</td>
-  <td>{{ r['total_claims'] or '' }}</td><td>{{ r['beneficiaries'] or '' }}</td>
+  <td>{{ r['total_claims'] if r['total_claims'] is not none else '' }}</td><td>{{ r['beneficiaries'] if r['beneficiaries'] is not none else '' }}</td>
   <td>{{ r['city'] or '' }}</td><td>{{ r['state'] or '' }}</td>
   <td>{{ r['kam'] or '' }}</td>
   <td>{{ r['clinic_name'] or '' }}</td>
